@@ -62,7 +62,7 @@
   sudo: yes
   gather_facts: yes
   vars:
-  - warName: polo7-7.0.war
+  - warName: koko.war
   - warRemotePath: /home/ec2-user/
   tasks: 
   - name: Install OpenJDK
@@ -78,11 +78,11 @@
   - name: install wget
     command: yum install -y wget
   - name: Download WAR to server
-    command: wget http://35.161.214.139:8081/nexus/content/repositories/repor/com/mypro/mavensample/polo7/7.0/polo7-7.0.war -O {{ warRemotePath }}/{{ warName }}
+    command: wget http://18.236.158.149:8081/nexus/content/repositories/repor/com/mypro/mavensample/koko/7.0/koko-7.0.war -O {{ warRemotePath }}/{{ warName }}
   - name: install unzip
     command: yum install -y unzip
   - name: Unzip WAR file
-    command: sudo unzip ./polo7-7.0.war -d /opt/apache-tomcat-7.0.61/webapps/polo
+    command: sudo unzip ./koko-7.0.war -d /opt/apache-tomcat-7.0.61/webapps/polo
     notify:
         - Restart tomcat7
   - name: Delete remote war file
