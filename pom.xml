@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mypro.mavensample</groupId>
-  <artifactId>polo7</artifactId>
+  <artifactId>solo1</artifactId>
   <packaging>war</packaging>
   <version>7.0</version>
-  <name>polo7</name>
+  <name>solo1</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
@@ -46,13 +46,13 @@
 	<repository>
 		<id>deployment</id>
 		<name>Release</name>
-		<url>http://35.161.214.139:8081/nexus/content/repositories/repor/</url>
+		<url>http://18.236.158.149:8081/nexus/content/repositories/repor/</url>
 	</repository>
  
 	<snapshotRepository>
 		<id>deployment</id>
 		<name>Snapshot Releases</name>
-		<url>http://35.161.214.139:8081/nexus/content/repositories/repos/</url>
+		<url>http://18.236.158.149:8081/nexus/content/repositories/repos/</url>
 	</snapshotRepository>
 
 </distributionManagement>
