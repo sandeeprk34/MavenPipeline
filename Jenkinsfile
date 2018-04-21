@@ -24,6 +24,13 @@ pipeline {
             }
         }
     }
+       stage('Maven Deploy') { 
+            steps {
+                withMaven(maven : 'mymaven') {
+	             sh 'ansible-playbook ec2.yml'
+            }
+        }
+    }
 
    }
 }
