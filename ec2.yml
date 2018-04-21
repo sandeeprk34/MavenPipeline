@@ -1,0 +1,98 @@
+--- #Creating an EC2 Instance in Custom VPC
+       # 1>Creating a custom Security Group
+       # 2>Spinning an EC2 Instance
+       
+- hosts: localhost
+  connection: local
+  gather_facts: yes
+  tasks:
+  - name: Creating a  Security Group
+    ec2_group:
+        name: newgrp
+        description: sec group for allowing traffic on ports 22 and 80 and 443
+        vpc_id: vpc-a17e41c7
+        region: us-west-2
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 443
+            to_port: 443
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 8080
+            to_port: 8080
+            cidr_ip: 0.0.0.0/0
+        rules_egress: 
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+  - name: Spinning an EC2 Instance
+    ec2:
+        key_name: key
+        region: us-west-2
+        instance_type: t2.micro
+        image: ami-223f945a
+        count: 1
+        monitoring: no
+        vpc_subnet_id: subnet-e33c7a85
+        assign_public_ip: yes
+        group: newgrp
+    register: ec2_out
+  - debug: var=ec2_out
+  - name: Add the new EC2 Instance Private IP to the group
+    add_host: 
+     hostname: "{{ item.private_ip }}"
+     groupname: node
+    with_items: "{{ ec2_out.instances }}"
+  - name: Wait for SSH to come up in the newly created EC2 Instance
+    wait_for: 
+     host: "{{ item.private_ip }}"
+     port: 22
+     state: started
+    with_items: "{{ ec2_out.instances }}"
+- hosts: node
+  connection: ssh
+  user: ec2-user
+  sudo: yes
+  gather_facts: yes
+  vars:
+  - warName: polo7-7.0.war
+  - warRemotePath: /home/ec2-user/
+  tasks: 
+  - name: Install OpenJDK
+    yum: name=java-1.7.0-openjdk state=present
+  - name: add group "tomcat"
+    group: name=tomcat7
+  - name: add user "tomcat"
+    user: name=tomcat7 group=tomcat7 home=/usr/share/tomcat createhome=no
+  - name: Download Tomcat
+    get_url: url=http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.61/bin/apache-tomcat-7.0.61.tar.gz dest=/opt/apache-tomcat-7.0.61.tar.gz
+  - name: Extract archive
+    command: chdir=/usr/share /bin/tar xvf /opt/apache-tomcat-7.0.61.tar.gz -C /opt/ creates=/opt/apache-tomcat-7.0.61
+  - name: install wget
+    command: yum install -y wget
+  - name: Download WAR to server
+    command: wget http://35.161.214.139:8081/nexus/content/repositories/repor/com/mypro/mavensample/polo7/7.0/polo7-7.0.war -O {{ warRemotePath }}/{{ warName }}
+  - name: install unzip
+    command: yum install -y unzip
+  - name: Unzip WAR file
+    command: sudo unzip ./polo7-7.0.war -d /opt/apache-tomcat-7.0.61/webapps/polo
+    notify:
+        - Restart tomcat7
+  - name: Delete remote war file
+    file: path={{ warRemotePath }}/{{ warName }} state=absent
+  handlers:
+  - name: Restart tomcat7
+    service: name=tomcat7 state=started
+  
+ 
+   
+    
+ 
+  
