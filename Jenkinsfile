@@ -24,9 +24,9 @@ pipeline {
             }
         }
     }
-       stage('Maven Deploy') { 
+       stage('Ansible Deploy') { 
             steps {
-                withMaven(maven : 'mymaven') {
+                withAnsible(ansible : 'myansible') {
 	             sh 'ansible-playbook ec2.yml'
             }
         }
