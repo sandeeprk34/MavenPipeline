@@ -24,13 +24,7 @@ pipeline {
             }
         }
     }
-       stage('Ansible Deploy') { 
-            steps {
-                withAnsible(ansible : 'myansible') {
-	             sh 'ansible-playbook ec2.yml'
-            }
-        }
-    }
+       
 
    }
 }
